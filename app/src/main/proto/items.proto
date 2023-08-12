@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "com.tung.datastore";
+option java_multiple_files = true;
+
+message Item{
+  string id = 1;
+  int32 price = 2;
+}
+
+message List{
+  repeated Item items = 1;
+}
