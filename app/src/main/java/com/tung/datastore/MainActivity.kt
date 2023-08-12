@@ -63,9 +63,13 @@ suspend fun saveNameToPrefs(newName: String, context: Context){
 //lấy list
 suspend fun DataStore<StringList>.getStringList(): List<String> {
     return try {
-        this.data.map { stringList ->
-            stringList.nameList // lấy list to proto
-        }.singleOrNull() ?: emptyList()
+        val stringLists = this.data.first() //lấy single value (giá trị đầu tiên)
+        val nameList = stringLists.nameList
+        if (nameList != null) {
+            nameList
+        } else {
+            emptyList()
+        }
     } catch (e: Exception) {
         emptyList()
     }
@@ -73,8 +77,8 @@ suspend fun DataStore<StringList>.getStringList(): List<String> {
 
 //cập nhật list
 suspend fun DataStore<StringList>.update(string: String) {
-    this.updateData { stringList ->
-        stringList.toBuilder().addName(string).build()
+    this.updateData { currentStringList ->
+        currentStringList.toBuilder().addName(string).build()
     }
 }
 
@@ -128,7 +132,7 @@ fun Composable(context: Context) {
                     Button(onClick = {
                         listState+=inputText //thêm phần tử mới
 
-                        Log.d("list elements",listState[0])
+
 
                         runBlocking {
                             launch {
@@ -141,6 +145,8 @@ fun Composable(context: Context) {
                         Toast.makeText(context, "Added $inputText successfully", Toast.LENGTH_SHORT)
                             .show()
 
+                        inputText=""
+
                     }) {
                         Text("Add name")
                     }
@@ -150,7 +156,7 @@ fun Composable(context: Context) {
 
             LazyColumn{
                 itemsIndexed(listState){
-                        index, string -> Text("$index. $string")
+                        index, string -> Text("${index+1}. $string")
                 }
             }
         }
