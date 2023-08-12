@@ -6,9 +6,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +25,7 @@ import com.tung.datastore.ui.theme.DataStoreTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import androidx.compose.ui.unit.dp
 
 val Context.dataStorePrefs: DataStore<Preferences> by preferencesDataStore(name = "settings")
 val nameKey=stringPreferencesKey("name") //key chứa tên
@@ -73,22 +72,26 @@ fun Composable(context: Context) {
             //giá trị textField sẽ được chứa trong input text
             TextField(value = inputText, onValueChange = {inputText = it}, label = { Text("Name") })
 
-            Button(margin,onClick = {
-                name = inputText
+            Box(modifier = Modifier.padding(vertical = 50.dp)) {
+                Button(onClick = {
+                    name = inputText
 
-                //chạy trong coroutine kotlin
-                runBlocking {
-                    launch {
-                        saveNameToPrefs(inputText,context)
+                    //chạy trong coroutine kotlin
+                    runBlocking {
+                        launch {
+                            saveNameToPrefs(inputText, context)
+                        }
                     }
+
+                    //hiện toast thông báo
+                    Toast.makeText(context, "Saved $inputText successfully", Toast.LENGTH_SHORT)
+                        .show()
+
+                }) {
+                    Text("Change name")
                 }
-
-                //hiện toast thông báo
-                Toast.makeText(context,"Saved $inputText successfully",Toast.LENGTH_SHORT).show()
-
-            }) {
-                Text("Change name")
             }
+
         }
     }
 }
